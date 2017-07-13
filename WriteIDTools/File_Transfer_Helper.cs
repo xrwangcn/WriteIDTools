@@ -82,8 +82,9 @@ namespace WriteIDTools
         private string WriteInfoRequest(File_Transfer_cfg trancfg, SerialPort FileSerial, string ID, string verson, int action)
         {
             byte[] w_buf = new byte[128];
+            string resultID = "";
+            string resultVER = "";
             string result = "";
-
             for (int i = 0; i < 128; i++)
             {
                 w_buf[i] = 0;
@@ -95,25 +96,25 @@ namespace WriteIDTools
             //serial id
             if (action == 1)
             {
-                w_buf[2] = 0x01;
+                w_buf[3] = 0x01;
             }
             else
             {
-                w_buf[2] = 0x02;
+                w_buf[3] = 0x02;
             }
 
             ID = StringToHexString(ID, System.Text.Encoding.ASCII);
             byte[] ID_temp = strToToHexByte(ID);
             for (int i = 0; i < ID_temp.Count(); i++)
             {
-                w_buf[3 + i] = ID_temp[i];
+                w_buf[4 + i] = ID_temp[i];
             }
 
-            verson = StringToHexString(ID, System.Text.Encoding.ASCII);
-            byte[] verson_temp = strToToHexByte(ID);
+            verson = StringToHexString(verson, System.Text.Encoding.ASCII);
+            byte[] verson_temp = strToToHexByte(verson);
             for (int i = 0; i < verson_temp.Count(); i++)
             {
-                w_buf[23 + i] = verson_temp[i];
+                w_buf[24 + i] = verson_temp[i];
             }
 
             FileSerial.Open();
@@ -150,24 +151,24 @@ namespace WriteIDTools
 
             if (r_buf[0] == 0x31 && r_buf[1] == 0x41)
             {
-                if (r_buf[2] == 0x02)//只有读取到2命令才返回值
+                if (r_buf[3] == 0x02)//只有读取到2命令才返回值
                 {
                     
                     byte[] IDtemp = new byte[20];
                     byte[] versontemp = new byte[20];
-                    Array.Copy(r_buf, 3, IDtemp, 0, 20);
-                    result = System.Text.Encoding.ASCII.GetString(IDtemp);
-                    result = ID.Replace("\0", "");
-                    Array.Copy(r_buf, 23, versontemp, 0, 20);
-                    result = System.Text.Encoding.ASCII.GetString(versontemp);
-                    result = result+"/|/"+ID.Replace("\0", "");
+                    Array.Copy(r_buf, 4, IDtemp, 0, 20);
+                    resultID = System.Text.Encoding.ASCII.GetString(IDtemp);
+                    resultID = resultID.Replace("\0", "");
+                    Array.Copy(r_buf, 24, versontemp, 0, 20);
+                    resultVER = System.Text.Encoding.ASCII.GetString(versontemp);
+                    result = resultID + "/|/" + resultVER.Replace("\0", "");
                 }
 
                 
             }
             else
             {
-
+                trancfg.RichTextBox_DoWork("烧写失败\n");
             }
             return result;
         }

@@ -7,3 +7,9 @@ D:\project\WriteIDTools\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.exe
 D:\project\WriteIDTools\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.pdb
 D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.exe
 D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.pdb
+D:\project\WriteIDTools\WriteIDTools\bin\Debug\WriteIDTools.exe
+D:\project\WriteIDTools\WriteIDTools\bin\Debug\WriteIDTools.pdb
+D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.csprojResolveAssemblyReference.cache
+D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.Form1.resources
+D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.Properties.Resources.resources
+D:\project\WriteIDTools\WriteIDTools\obj\x86\Debug\WriteIDTools.csproj.GenerateResource.Cache

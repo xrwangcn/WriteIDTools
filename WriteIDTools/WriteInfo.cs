@@ -17,11 +17,10 @@ namespace WriteIDTools
         public string ID="";
         public string verson="";
         public int action;
-        public string WriteInfoFunc(string ComPortName, int actiontemp)
+        public string WriteInfoFunc(int actiontemp)
         {
             tran_helper = new File_Transfer_Helper();
-            transfer_cfg = new File_Transfer_cfg();
-            transfer_cfg.ComPortName = ComPortName;
+
             action = actiontemp;
             if (!initCheck())
             {
@@ -29,15 +28,21 @@ namespace WriteIDTools
                 return string.Empty;
             }
             
-            string ID = "";
-            FILE_Trans_Thread = new Thread(new ThreadStart(WriteInfo_func));
-            FILE_Trans_Thread.Priority = ThreadPriority.Highest;
-            FILE_Trans_Thread.IsBackground = true;
-            FILE_Trans_Thread.Start();
-            return ID;
+            //string ID = "";
+            //FILE_Trans_Thread = new Thread(new ThreadStart(WriteInfo_func));
+            //FILE_Trans_Thread.Priority = ThreadPriority.Highest;
+            //FILE_Trans_Thread.IsBackground = true;
+            //FILE_Trans_Thread.Start();
+
+            return tran_helper.WriteInfo(transfer_cfg, ID, verson, action); 
         }
 
-
+        public void cfgInit(string ComPortName,RichTextBox log)
+        {
+            transfer_cfg = new File_Transfer_cfg();
+            transfer_cfg.ComPortName = ComPortName;
+            transfer_cfg.RichTextBox = log;
+        }
         private void WriteInfo_func()
         {
             tran_helper.WriteInfo(transfer_cfg, ID, verson,action);
