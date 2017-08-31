@@ -39,12 +39,11 @@ namespace WriteIDTools
         /// </summary>
         /// <param name="trancfg"></param>
         /// <returns></returns>
-        public string WriteInfo(File_Transfer_cfg trancfg, string ID, string verson, int action)
+        public responseInfo WriteInfo(File_Transfer_cfg trancfg, writeInfo info)
         {
             FileSerial = new SerialPort();
-
+            responseInfo result = new responseInfo();
             FileSerial.PortName = trancfg.ComPortName;
-            string result = "";
             try
             {
                 //if (KLINE.IsOpen)
@@ -64,7 +63,7 @@ namespace WriteIDTools
                 FileSerial.DtrEnable = true;
 
 
-                result = WriteInfoRequest(trancfg, FileSerial, ID, verson, action);
+                result = WriteInfoRequest(trancfg, FileSerial, info);
             }
 
             catch (System.Exception ex)
@@ -79,12 +78,12 @@ namespace WriteIDTools
             FileSerial = null;
             return result;
         }
-        private string WriteInfoRequest(File_Transfer_cfg trancfg, SerialPort FileSerial, string ID, string verson, int action)
+        private responseInfo WriteInfoRequest(File_Transfer_cfg trancfg, SerialPort FileSerial, writeInfo info)
         {
             byte[] w_buf = new byte[128];
             string resultID = "";
             string resultVER = "";
-            string result = "";
+            responseInfo result = new responseInfo();
             for (int i = 0; i < 128; i++)
             {
                 w_buf[i] = 0;
@@ -94,7 +93,7 @@ namespace WriteIDTools
             w_buf[1] = 0x41;//动作类型
 
             //serial id
-            if (action == 1)
+            if (info.action == 1)
             {
                 w_buf[3] = 0x01;
             }
@@ -103,20 +102,24 @@ namespace WriteIDTools
                 w_buf[3] = 0x02;
             }
 
-            ID = StringToHexString(ID, System.Text.Encoding.ASCII);
-            byte[] ID_temp = strToToHexByte(ID);
+            info.ID = StringToHexString(info.ID, System.Text.Encoding.ASCII);
+            byte[] ID_temp = strToToHexByte(info.ID);
             for (int i = 0; i < ID_temp.Count(); i++)
             {
                 w_buf[4 + i] = ID_temp[i];
             }
 
-            verson = StringToHexString(verson, System.Text.Encoding.ASCII);
-            byte[] verson_temp = strToToHexByte(verson);
+            info.verson = StringToHexString(info.verson, System.Text.Encoding.ASCII);
+            byte[] verson_temp = strToToHexByte(info.verson);
             for (int i = 0; i < verson_temp.Count(); i++)
             {
                 w_buf[24 + i] = verson_temp[i];
             }
-
+            if (info.encKey != null)
+                for (int i = 0; i < 16; i++)
+                {
+                    w_buf[44 + i] = info.encKey[i];
+                }
             FileSerial.Open();
 
             FileSerial.Write(w_buf, 0, 128);
@@ -153,7 +156,14 @@ namespace WriteIDTools
             {
                 if (r_buf[3] == 0x02)//只有读取到2命令才返回值
                 {
-                    
+                    if (info.action == 3)//只有读取到2命令才返回值
+                    {
+
+                        byte[] SN = new byte[20];
+                        Array.Copy(r_buf, 64, SN, 0, 20);
+                        result.SN = SN;
+                        return result;
+                    }
                     byte[] IDtemp = new byte[20];
                     byte[] versontemp = new byte[20];
                     Array.Copy(r_buf, 4, IDtemp, 0, 20);
@@ -161,7 +171,7 @@ namespace WriteIDTools
                     resultID = resultID.Replace("\0", "");
                     Array.Copy(r_buf, 24, versontemp, 0, 20);
                     resultVER = System.Text.Encoding.ASCII.GetString(versontemp);
-                    result = resultID + "/|/" + resultVER.Replace("\0", "");
+                    result.ID = resultID + "/|/" + resultVER.Replace("\0", "");
                 }
 
                 

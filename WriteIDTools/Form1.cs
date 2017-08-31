@@ -37,6 +37,8 @@ namespace WriteIDTools
             textBox6.Text = dataStr;
         }
 
+        static private string KEY = "10607D51C21D056FD612AC1A8E5D3848";
+        responseInfo reinfo = new responseInfo();
         private void button1_Click(object sender, EventArgs e)
         {
             if (comboBox1.SelectedIndex == -1)
@@ -45,13 +47,21 @@ namespace WriteIDTools
                 return;
             }
             WriteInfo req = new WriteInfo();
+            writeInfo info = new writeInfo();//写入设备的信息
             string temp = numericUpDown1.Value.ToString().PadLeft(3, '0');
-            req.ID = textBox1.Text + textBox6.Text + textBox5.Text+temp;
-            req.verson = textBox2.Text;
-            LogRichTextBox.AppendText("ID: " + req.ID + ",硬件版本: " + req.verson + "\n开始烧写...\n");
+
+
 
             req.cfgInit(comboBox1.Items[comboBox1.SelectedIndex].ToString(),LogRichTextBox);
-            req.WriteInfoFunc(1);
+            info.action = 3;
+            reinfo = req.WriteInfoFunc(info);
+            byte[] snData = reinfo.SN;
+            info.encKey = AESHelper.AESEncrypt(snData, KEY);
+            info.action = 1;
+            info.ID = textBox1.Text + textBox6.Text + textBox5.Text + temp;
+            info.verson = textBox2.Text;
+            LogRichTextBox.AppendText("ID: " + info.ID + ",硬件版本: " + info.verson + "\n开始烧写...\n");
+            req.WriteInfoFunc(info);
             LogRichTextBox.AppendText("烧写成功\n");
         }
 
@@ -63,9 +73,10 @@ namespace WriteIDTools
                 return;
             }
             WriteInfo req = new WriteInfo();
-
+            writeInfo wInfo = new writeInfo();
             req.cfgInit(comboBox1.Items[comboBox1.SelectedIndex].ToString(), LogRichTextBox);
-            string result = req.WriteInfoFunc(2);
+            wInfo.action = 2;
+            string result = req.WriteInfoFunc(wInfo).ID; 
             string[] info = result.Split(new char[3] { '/', '|', '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (info.Count() == 0)
             {
@@ -74,6 +85,14 @@ namespace WriteIDTools
             }
             MessageBox.Show("ID:" + info[0]); 
             LogRichTextBox.AppendText("ID: " + info[0] + ",硬件版本: " + info[1] + "\n");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string temp = numericUpDown1.Value.ToString().PadLeft(3, '0');
+            string ID = textBox1.Text + textBox6.Text + textBox5.Text + temp;
+            LogRichTextBox.AppendText("ID: " + ID +"\n");
+            //textBox3.Text = Convert.ToBase64String(AESHelper.AESEncrypt(ID, KEY));
         }
 
 

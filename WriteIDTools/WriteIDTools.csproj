@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AESHelper.cs" />
     <Compile Include="File_Transfer_cfg.cs" />
     <Compile Include="File_Transfer_Helper.cs" />
     <Compile Include="Form1.cs">

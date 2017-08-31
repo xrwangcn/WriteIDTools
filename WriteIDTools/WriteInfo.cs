@@ -17,15 +17,18 @@ namespace WriteIDTools
         public string ID="";
         public string verson="";
         public int action;
-        public string WriteInfoFunc(int actiontemp)
+        public byte[] encKey;
+        public WriteInfo()
+        {
+            encKey = new byte[20];
+        }
+        public responseInfo WriteInfoFunc(writeInfo info)
         {
             tran_helper = new File_Transfer_Helper();
-
-            action = actiontemp;
             if (!initCheck())
             {
                 MessageBox.Show("请选择串口！");
-                return string.Empty;
+                return null;
             }
             
             //string ID = "";
@@ -34,7 +37,7 @@ namespace WriteIDTools
             //FILE_Trans_Thread.IsBackground = true;
             //FILE_Trans_Thread.Start();
 
-            return tran_helper.WriteInfo(transfer_cfg, ID, verson, action); 
+            return tran_helper.WriteInfo(transfer_cfg, info); 
         }
 
         public void cfgInit(string ComPortName,RichTextBox log)
@@ -43,10 +46,10 @@ namespace WriteIDTools
             transfer_cfg.ComPortName = ComPortName;
             transfer_cfg.RichTextBox = log;
         }
-        private void WriteInfo_func()
-        {
-            tran_helper.WriteInfo(transfer_cfg, ID, verson,action);
-        }
+        //private void WriteInfo_func()
+        //{
+        //    tran_helper.WriteInfo(transfer_cfg, info);
+        //}
 
         public Boolean initCheck()
         {
@@ -77,5 +80,19 @@ namespace WriteIDTools
             return res.ToArray<string>();
         }
 
+    }
+
+    public class responseInfo
+    {
+        public string ID;
+        public byte[] SN = new byte[20];
+    }
+
+    public class writeInfo
+    {
+        public string ID = "";
+        public string verson = "";
+        public int action;
+        public byte[] encKey;
     }
 }
